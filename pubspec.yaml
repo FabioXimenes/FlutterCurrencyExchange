@@ -7,11 +7,15 @@ environment:
   sdk: '>=3.2.4 <4.0.0'
 
 dependencies:
+  currency_text_input_formatter: ^2.1.14
   dartz: ^0.10.1
   dio: ^5.4.3
   equatable: ^2.0.5
   flutter:
     sdk: flutter
+  flutter_bloc: ^8.1.5
+  flutter_dotenv: ^5.1.0
+  get_it: ^7.6.7
   json_annotation: ^4.8.1
 
 dev_dependencies:
@@ -27,8 +31,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/env/.env
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
