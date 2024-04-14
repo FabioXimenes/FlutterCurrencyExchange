@@ -12,7 +12,7 @@ class CurrencyExchangeLocalDataSourceImpl
     implements CurrencyExchangeLocalDataSource {
   final LocalStorageClient localStorageClient;
 
-  CurrencyExchangeLocalDataSourceImpl({required this.localStorageClient});
+  CurrencyExchangeLocalDataSourceImpl(this.localStorageClient);
 
   final key = 'latest_currency_exchanges';
 

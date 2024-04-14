@@ -11,7 +11,7 @@ class CurrencyExchangeResourcesStartup extends ResourcesStartup {
         CurrencyExchangeRemoteDataSourceImpl(apiClient: sl.get()));
 
     sl.registerSingleton<CurrencyExchangeLocalDataSource>(
-        CurrencyExchangeLocalDataSourceImpl(localStorageClient: sl.get()));
+        CurrencyExchangeLocalDataSourceImpl(sl.get()));
 
     sl.registerSingleton<CurrencyExchangeRepository>(
       CurrencyExchangeRepositoryImpl(
