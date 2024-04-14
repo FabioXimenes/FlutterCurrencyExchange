@@ -4,6 +4,7 @@ import 'package:flutter_currency_exchange/app/features/exchange/data_sources/cur
 import 'package:flutter_currency_exchange/app/features/exchange/errors/exchange_failures.dart';
 import 'package:flutter_currency_exchange/app/features/exchange/models/currency.dart';
 import 'package:flutter_currency_exchange/app/features/exchange/models/currency_exchange_api_quota.dart';
+import 'package:flutter_currency_exchange/app/features/exchange/models/exchange.dart';
 import 'package:flutter_currency_exchange/app/features/exchange/repositories/currency_exchange_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -206,6 +207,144 @@ void main() {
 
         // assert
         expect(result, Left(GetExchangeRateFailure()));
+      },
+    );
+  });
+
+  group('cacheCurrencyExchanges', () {
+    const tExchange = Exchange(
+      fromCurrency: Currency(
+        code: 'USD',
+        name: 'United States Dollar',
+        symbol: '\$',
+      ),
+      toCurrency: Currency(
+        code: 'BRL',
+        name: 'Brazilian Real',
+        symbol: 'R\$',
+      ),
+      rate: 5.13,
+      fromAmount: 1,
+      toAmount: 5.13,
+    );
+
+    void setUpSuccessfulLocalDataSourceCall() {
+      when(() => mockLocalDataSource.cacheCurrencyExchanges([tExchange]))
+          .thenAnswer((_) async => true);
+    }
+
+    test(
+      'should call CurrencyExchangeLocalDataSource.cacheCurrencyExchanges',
+      () {
+        // arrange
+        setUpSuccessfulLocalDataSourceCall();
+
+        // act
+        repository.cacheCurrencyExchanges([tExchange]);
+
+        // assert
+        verify(() => mockLocalDataSource.cacheCurrencyExchanges([tExchange]))
+            .called(1);
+      },
+    );
+
+    test(
+      'should return Right(bool) when the call to the data source is successful',
+      () async {
+        // arrange
+        setUpSuccessfulLocalDataSourceCall();
+
+        // act
+        final result = await repository.cacheCurrencyExchanges([tExchange]);
+
+        // assert
+        expect(result, const Right(true));
+      },
+    );
+
+    test(
+      'should return Left(CacheCurrencyExchangesFailure) when the call to the '
+      'data source is unsuccessful',
+      () async {
+        // arrange
+        when(() => mockLocalDataSource.cacheCurrencyExchanges([tExchange]))
+            .thenThrow(Exception());
+
+        // act
+        final result = await repository.cacheCurrencyExchanges([tExchange]);
+
+        // assert
+        expect(result, Left(CacheCurrencyExchangesFailure()));
+      },
+    );
+  });
+
+  group('getLatestCurrencyExchanges', () {
+    const tExchanges = [
+      Exchange(
+        fromCurrency: Currency(
+          code: 'USD',
+          name: 'United States Dollar',
+          symbol: '\$',
+        ),
+        toCurrency: Currency(
+          code: 'BRL',
+          name: 'Brazilian Real',
+          symbol: 'R\$',
+        ),
+        rate: 5.13,
+        fromAmount: 1,
+        toAmount: 5.13,
+      ),
+    ];
+
+    void setUpSuccessfulLocalDataSourceCall() {
+      when(() => mockLocalDataSource.getLatestCurrencyExchanges())
+          .thenAnswer((_) async => tExchanges);
+    }
+
+    test(
+      'should call CurrencyExchangeLocalDataSource.getLatestCurrencyExchanges',
+      () {
+        // arrange
+        setUpSuccessfulLocalDataSourceCall();
+
+        // act
+        repository.getLatestCurrencyExchanges();
+
+        // assert
+        verify(() => mockLocalDataSource.getLatestCurrencyExchanges())
+            .called(1);
+      },
+    );
+
+    test(
+      'should return Right(List<Exchange>) when the call to the data source is successful',
+      () async {
+        // arrange
+        setUpSuccessfulLocalDataSourceCall();
+
+        // act
+        final result = await repository.getLatestCurrencyExchanges();
+
+        // assert
+        expect(result, const Right(tExchanges));
+      },
+    );
+
+    test(
+      'should return Left(GetLatestCurrencyExchangesFailure) when the call to the '
+      'data source is unsuccessful',
+      () async {
+        // arrange
+        when(() => mockLocalDataSource.getLatestCurrencyExchanges())
+            .thenThrow(Exception());
+
+        // act
+        final result = await repository.getLatestCurrencyExchanges();
+
+        // assert
+        expect(result, Left(GetLatestCurrencyExchangesFailure()));
       },
     );
   });
