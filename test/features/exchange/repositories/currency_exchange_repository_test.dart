@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter_currency_exchange/app/features/exchange/data_sources/currency_exchange_local_data_source.dart';
 import 'package:flutter_currency_exchange/app/features/exchange/data_sources/currency_exchange_remote_data_source.dart';
 import 'package:flutter_currency_exchange/app/features/exchange/errors/exchange_failures.dart';
 import 'package:flutter_currency_exchange/app/features/exchange/models/currency.dart';
@@ -10,14 +11,21 @@ import 'package:mocktail/mocktail.dart';
 class MockCurrencyExchangeRemoteDataSource extends Mock
     implements CurrencyExchangeRemoteDataSource {}
 
+class MockCurrencyExchangeLocalDataSource extends Mock
+    implements CurrencyExchangeLocalDataSource {}
+
 void main() {
   late MockCurrencyExchangeRemoteDataSource mockRemoteDataSource;
+  late MockCurrencyExchangeLocalDataSource mockLocalDataSource;
   late CurrencyExchangeRepository repository;
 
   setUp(() {
     mockRemoteDataSource = MockCurrencyExchangeRemoteDataSource();
-    repository =
-        CurrencyExchangeRepositoryImpl(remoteDataSource: mockRemoteDataSource);
+    mockLocalDataSource = MockCurrencyExchangeLocalDataSource();
+    repository = CurrencyExchangeRepositoryImpl(
+      remoteDataSource: mockRemoteDataSource,
+      localDataSource: mockLocalDataSource,
+    );
   });
 
   group('getAPIQuota', () {

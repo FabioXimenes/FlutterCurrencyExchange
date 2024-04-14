@@ -11,3 +11,9 @@ Currency _$CurrencyFromJson(Map<String, dynamic> json) => Currency(
       name: json['name'] as String,
       symbol: json['symbol'] as String,
     );
+
+Map<String, dynamic> _$CurrencyToJson(Currency instance) => <String, dynamic>{
+      'code': instance.code,
+      'name': instance.name,
+      'symbol': instance.symbol,
+    };

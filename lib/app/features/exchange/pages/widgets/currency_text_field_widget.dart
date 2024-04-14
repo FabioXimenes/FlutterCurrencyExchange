@@ -1,9 +1,8 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_currency_exchange/app/features/exchange/models/currency.dart';
-import 'package:flutter_currency_exchange/app/features/exchange/pages/cubit/currencies/currencies_cubit.dart';
+import 'package:flutter_currency_exchange/app/features/exchange/pages/cubits/currencies/currencies_cubit.dart';
 
 class CurrencyTextFieldWidget extends StatefulWidget {
   final Currency? initialCurrency;
@@ -30,7 +29,7 @@ class CurrencyTextFieldWidget extends StatefulWidget {
 
 class _CurrencyTextFieldWidgetState extends State<CurrencyTextFieldWidget> {
   TextEditingController textController = TextEditingController();
-  CurrencyTextInputFormatter? formatter;
+  late CurrencyTextInputFormatter formatter;
   Currency? selectedCurrency;
 
   @override
@@ -43,7 +42,7 @@ class _CurrencyTextFieldWidgetState extends State<CurrencyTextFieldWidget> {
     );
     if (widget.initialAmount != null) {
       textController.text =
-          formatter!.format(widget.initialAmount!.toStringAsFixed(2));
+          formatter.format(widget.initialAmount!.toStringAsFixed(2));
     }
   }
 
@@ -53,7 +52,7 @@ class _CurrencyTextFieldWidgetState extends State<CurrencyTextFieldWidget> {
 
     if (oldWidget.initialAmount != widget.initialAmount) {
       textController.text =
-          formatter!.format(widget.initialAmount!.toStringAsFixed(2));
+          formatter.format(widget.initialAmount!.toStringAsFixed(2));
     }
 
     if (oldWidget.initialCurrency != widget.initialCurrency) {
@@ -77,6 +76,19 @@ class _CurrencyTextFieldWidgetState extends State<CurrencyTextFieldWidget> {
             Expanded(
               child: TextFormField(
                 enabled: widget.enabled,
+                onTap: () {
+                  if (selectedCurrency == null) {
+                    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Please select the currency first.',
+                        ),
+                      ),
+                    );
+                  }
+                },
+                canRequestFocus: selectedCurrency != null,
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   prefix: selectedCurrency != null
@@ -125,7 +137,7 @@ class _CurrencyTextFieldWidgetState extends State<CurrencyTextFieldWidget> {
                                           symbol: '',
                                           decimalDigits: 2,
                                         );
-                                        textController.text = formatter!
+                                        textController.text = formatter
                                             .format(textController.text);
                                         widget.onCurrencySelected(currency);
                                       }
@@ -140,15 +152,11 @@ class _CurrencyTextFieldWidgetState extends State<CurrencyTextFieldWidget> {
                   ),
                 ),
                 controller: textController,
-                inputFormatters: [
-                  formatter ?? FilteringTextInputFormatter.digitsOnly
-                ],
+                inputFormatters: [formatter],
                 keyboardType: TextInputType.number,
                 onChanged: (value) {
-                  final amount = double.tryParse(value);
-                  if (amount != null) {
-                    widget.onValueChanged(amount);
-                  }
+                  final amount = formatter.getUnformattedValue();
+                  widget.onValueChanged(amount.toDouble());
                 },
               ),
             ),

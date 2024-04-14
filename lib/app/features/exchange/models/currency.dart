@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'currency.g.dart';
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class Currency extends Equatable {
   const Currency({
     required this.code,
@@ -17,6 +17,8 @@ class Currency extends Equatable {
 
   factory Currency.fromJson(Map<String, dynamic> json) =>
       _$CurrencyFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CurrencyToJson(this);
 
   @override
   List<Object?> get props => [code, name, symbol];

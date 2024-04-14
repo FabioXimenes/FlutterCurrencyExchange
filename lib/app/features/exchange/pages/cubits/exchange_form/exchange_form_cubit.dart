@@ -34,14 +34,16 @@ class ExchangeFormCubit extends Cubit<ExchangeFormState> {
   void setBaseAmount(double amount) {
     emit(state.copyWith(
       baseAmount: amount,
-      targetAmount: amount * (state.rate ?? 1),
+      targetAmount:
+          state.targetCurrency != null ? amount * (state.rate ?? 1) : null,
     ));
   }
 
   void setTargetAmount(double amount) {
     emit(state.copyWith(
       targetAmount: amount,
-      baseAmount: amount / (state.rate ?? 1),
+      baseAmount:
+          state.baseCurrency != null ? amount / (state.rate ?? 1) : null,
     ));
   }
 

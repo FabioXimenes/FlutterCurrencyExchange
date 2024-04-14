@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_currency_exchange/app/core/styles/text_styles.dart';
 import 'package:flutter_currency_exchange/app/features/exchange/models/currency_exchange_api_quota.dart';
-import 'package:flutter_currency_exchange/app/features/exchange/pages/cubit/api_quota/api_quota_cubit.dart';
+import 'package:flutter_currency_exchange/app/features/exchange/pages/cubits/api_quota/api_quota_cubit.dart';
 
-class RequestQuotaLimit extends StatelessWidget {
-  const RequestQuotaLimit({super.key});
+class RequestLimitsWidget extends StatelessWidget {
+  const RequestLimitsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +18,18 @@ class RequestQuotaLimit extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text('Request Quota'),
+                Text(
+                  'Request Limits',
+                  style: TextStyles.titleSmallBold(context),
+                ),
                 const SizedBox(height: 8),
                 switch (state) {
                   APIQuotaInitial() => const SizedBox(),
-                  APIQuotaLoading() => const CircularProgressIndicator(),
+                  APIQuotaLoading() => const SizedBox(
+                      height: 90,
+                      width: double.infinity,
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
                   APIQuotaLoaded() => _QuotaLoaded(quota: state.quota),
                   APIQuotaFailed() => const Text('Failed to load quota'),
                 }

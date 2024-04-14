@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_currency_exchange/app/features/exchange/models/currency.dart';
-import 'package:flutter_currency_exchange/app/features/exchange/pages/cubit/api_quota/api_quota_cubit.dart';
-import 'package:flutter_currency_exchange/app/features/exchange/pages/cubit/currencies/currencies_cubit.dart';
-import 'package:flutter_currency_exchange/app/features/exchange/pages/cubit/exchange_form/exchange_form_cubit.dart';
-import 'package:flutter_currency_exchange/app/features/exchange/pages/widgets/currency_text_field_widget.dart';
-import 'package:flutter_currency_exchange/app/features/exchange/pages/widgets/request_quota_limit_widget.dart';
+import 'package:flutter_currency_exchange/app/features/exchange/pages/cubits/api_quota/api_quota_cubit.dart';
+import 'package:flutter_currency_exchange/app/features/exchange/pages/cubits/currencies/currencies_cubit.dart';
+import 'package:flutter_currency_exchange/app/features/exchange/pages/cubits/exchange_form/exchange_form_cubit.dart';
+import 'package:flutter_currency_exchange/app/features/exchange/pages/cubits/latest_exchanges/latest_exchanges_cubit.dart';
+import 'package:flutter_currency_exchange/app/features/exchange/pages/widgets/currency_exchange_input_widget.dart';
+import 'package:flutter_currency_exchange/app/features/exchange/pages/widgets/latest_rates_widget.dart';
+import 'package:flutter_currency_exchange/app/features/exchange/pages/widgets/request_limits_widget.dart';
 import 'package:get_it/get_it.dart';
 
 class CurrencyExchangePage extends StatefulWidget {
@@ -33,6 +35,10 @@ class _MyHomePageState extends State<CurrencyExchangePage> {
           create: (context) =>
               APIQuotaCubit(GetIt.instance.get())..getApiQuota(),
         ),
+        BlocProvider(
+          create: (context) =>
+              LatestExchangesCubit(GetIt.instance.get())..getLatestExchanges(),
+        )
       ],
       child: Scaffold(
         appBar: AppBar(
@@ -48,18 +54,21 @@ class _MyHomePageState extends State<CurrencyExchangePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     const SizedBox(height: 16),
-                    const RequestQuotaLimit(),
+                    const RequestLimitsWidget(),
                     const SizedBox(height: 16),
                     switch (state) {
                       CurrenciesInitial() => const SizedBox(),
-                      CurrenciesLoading() => const CircularProgressIndicator(),
+                      CurrenciesLoading() => const SizedBox(
+                          height: 140,
+                          width: double.infinity,
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
                       CurrenciesFailed() =>
                         const Text('Failed to load currencies'),
                       CurrenciesLoaded() => const CurrencyExchangeInputWidget(),
                     },
                     const SizedBox(height: 16),
-                    const Text('Latest Rates'),
-                    // TODO: Create the latest rates widget
+                    const LatestExchangesWidget(),
                   ],
                 );
               },
@@ -67,90 +76,6 @@ class _MyHomePageState extends State<CurrencyExchangePage> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class CurrencyExchangeInputWidget extends StatelessWidget {
-  const CurrencyExchangeInputWidget({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<ExchangeFormCubit, ExchangeFormState>(
-      builder: (context, state) {
-        final cubit = context.read<ExchangeFormCubit>();
-        return Column(
-          children: [
-            CurrencyTextFieldWidget(
-              key: const Key('baseCurrency'),
-              hintText: 'Select base currency',
-              initialCurrency: state.baseCurrency,
-              initialAmount: state.baseAmount,
-              onCurrencySelected: (currency) {
-                cubit.setBaseCurrency(currency);
-                if (state.targetCurrency != null) {
-                  context.read<APIQuotaCubit>().incrementUsage();
-                }
-              },
-              onValueChanged: (value) {
-                cubit.setBaseAmount(value);
-              },
-              enabled: !state.isLoading,
-            ),
-            Center(
-              child: IconButton(
-                iconSize: 32,
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  cubit.swapCurrencies();
-                },
-                icon: const Icon(Icons.swap_vertical_circle_rounded),
-              ),
-            ),
-            CurrencyTextFieldWidget(
-              key: const Key('targetCurrency'),
-              hintText: 'Select target currency',
-              initialCurrency: state.targetCurrency,
-              initialAmount: state.targetAmount,
-              onCurrencySelected: (currency) {
-                cubit.setTargetCurrency(currency);
-                if (state.baseCurrency != null) {
-                  context.read<APIQuotaCubit>().incrementUsage();
-                }
-              },
-              onValueChanged: (value) {
-                cubit.setTargetAmount(value);
-              },
-              enabled: !state.isLoading,
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: OutlinedButton(
-                onPressed: () {
-                  // TODO: Implement the accept quote logic
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (state.isLoading)
-                      const Padding(
-                        padding: EdgeInsets.only(right: 8.0),
-                        child: SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 3),
-                        ),
-                      ),
-                    const Text('Accept quote'),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }
