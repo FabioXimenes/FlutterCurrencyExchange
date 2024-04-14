@@ -6,25 +6,17 @@ abstract class LocalStorageClient {
 }
 
 class SharedPreferencesStorageClient extends LocalStorageClient {
-  SharedPreferences? prefs;
+  SharedPreferences sharedPreferences;
 
-  init() async {
-    prefs = await SharedPreferences.getInstance();
-  }
+  SharedPreferencesStorageClient(this.sharedPreferences);
 
   @override
   Future<String?> get(String key) async {
-    if (prefs == null) {
-      await init();
-    }
-    return prefs!.getString(key);
+    return sharedPreferences.getString(key);
   }
 
   @override
   Future<bool> set(String key, String value) async {
-    if (prefs == null) {
-      await init();
-    }
-    return prefs!.setString(key, value);
+    return sharedPreferences.setString(key, value);
   }
 }
