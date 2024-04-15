@@ -7,17 +7,20 @@
         {
             "name": "FlutterCurrencyExchange",
             "request": "launch",
+            "program": "lib/main.dart",
             "type": "dart"
         },
         {
             "name": "FlutterCurrencyExchange (profile mode)",
             "request": "launch",
+            "program": "lib/main.dart",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
             "name": "FlutterCurrencyExchange (release mode)",
             "request": "launch",
+            "program": "lib/main.dart",
             "type": "dart",
             "flutterMode": "release"
         }
