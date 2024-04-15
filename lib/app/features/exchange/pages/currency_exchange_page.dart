@@ -40,41 +40,56 @@ class _MyHomePageState extends State<CurrencyExchangePage> {
               LatestExchangesCubit(GetIt.instance.get())..getLatestExchanges(),
         )
       ],
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: const Text('Currency Exchange'),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: SingleChildScrollView(
-            child: BlocBuilder<CurrenciesCubit, CurrenciesState>(
-              builder: (context, state) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const SizedBox(height: 16),
-                    const RequestLimitsWidget(),
-                    const SizedBox(height: 16),
-                    switch (state) {
-                      CurrenciesInitial() => const SizedBox(),
-                      CurrenciesLoading() => const SizedBox(
-                          height: 140,
-                          width: double.infinity,
-                          child: Center(child: CircularProgressIndicator()),
-                        ),
-                      CurrenciesFailed() =>
-                        const Text('Failed to load currencies'),
-                      CurrenciesLoaded() => const CurrencyExchangeInputWidget(),
-                    },
-                    const SizedBox(height: 16),
-                    const LatestExchangesWidget(),
-                  ],
-                );
-              },
+      child: Builder(
+        builder: (context) {
+          return Scaffold(
+            appBar: AppBar(
+              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+              title: const Text('Currency Exchange'),
             ),
-          ),
-        ),
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  context.read<CurrenciesCubit>().loadCurrencies();
+                  context.read<APIQuotaCubit>().getApiQuota();
+                  context.read<LatestExchangesCubit>().getLatestExchanges();
+                },
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics()),
+                  child: BlocBuilder<CurrenciesCubit, CurrenciesState>(
+                    builder: (context, state) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          const SizedBox(height: 16),
+                          const RequestLimitsWidget(),
+                          const SizedBox(height: 16),
+                          switch (state) {
+                            CurrenciesInitial() => const SizedBox(),
+                            CurrenciesLoading() => const SizedBox(
+                                height: 140,
+                                width: double.infinity,
+                                child:
+                                    Center(child: CircularProgressIndicator()),
+                              ),
+                            CurrenciesFailed() =>
+                              const Text('Failed to load currencies'),
+                            CurrenciesLoaded() =>
+                              const CurrencyExchangeInputWidget(),
+                          },
+                          const SizedBox(height: 16),
+                          const LatestExchangesWidget(),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
