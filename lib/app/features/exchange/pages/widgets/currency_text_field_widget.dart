@@ -129,6 +129,9 @@ class _CurrencyTextFieldWidgetState extends State<CurrencyTextFieldWidget> {
                   );
                 }
               },
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
               canRequestFocus: selectedCurrency != null,
               decoration: InputDecoration(
                 prefix: selectedCurrency != null
