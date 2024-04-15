@@ -71,94 +71,80 @@ class _CurrencyTextFieldWidgetState extends State<CurrencyTextFieldWidget> {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: TextFormField(
-                enabled: widget.enabled,
-                onTap: () {
-                  if (selectedCurrency == null) {
-                    ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Please select the currency first.',
-                        ),
+            BlocBuilder<CurrenciesCubit, CurrenciesState>(
+              builder: (context, state) {
+                if (state is! CurrenciesLoaded) {
+                  return const SizedBox();
+                }
+
+                return DropdownButtonHideUnderline(
+                  child: DropdownButton<Currency>(
+                    alignment: Alignment.centerLeft,
+                    isDense: true,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    items: List.generate(
+                      state.currencies.length,
+                      (index) => DropdownMenuItem(
+                        value: state.currencies[index],
+                        child: Text(
+                            '${state.currencies[index].code} - ${state.currencies[index].name}'),
                       ),
-                    );
-                  }
-                },
-                canRequestFocus: selectedCurrency != null,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  prefix: selectedCurrency != null
-                      ? Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Text(selectedCurrency!.symbol),
-                        )
-                      : null,
-                  suffixIcon: SizedBox(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          height: 32,
-                          width: 2,
-                          color: Colors.grey,
-                        ),
-                        const SizedBox(width: 8),
-                        BlocBuilder<CurrenciesCubit, CurrenciesState>(
-                          builder: (context, state) {
-                            if (state is! CurrenciesLoaded) {
-                              return const SizedBox();
-                            }
-
-                            return DropdownButtonHideUnderline(
-                              child: DropdownButton<Currency>(
-                                alignment: Alignment.centerRight,
-                                style: Theme.of(context).textTheme.bodyMedium,
-                                items: List.generate(
-                                  state.currencies.length,
-                                  (index) => DropdownMenuItem(
-                                    value: state.currencies[index],
-                                    child: Text(
-                                        '${state.currencies[index].code} - ${state.currencies[index].name}'),
-                                  ),
-                                ),
-                                hint: Text(widget.hintText),
-                                onChanged: widget.enabled
-                                    ? (currency) {
-                                        if (currency == null) return;
-                                        setState(() {
-                                          selectedCurrency = currency;
-                                        });
-
-                                        formatter = CurrencyTextInputFormatter(
-                                          symbol: '',
-                                          decimalDigits: 2,
-                                        );
-                                        textController.text = formatter
-                                            .format(textController.text);
-                                        widget.onCurrencySelected(currency);
-                                      }
-                                    : null,
-                                value: selectedCurrency,
-                              ),
-                            );
-                          },
-                        ),
-                      ],
                     ),
+                    hint: Text(widget.hintText),
+                    onChanged: widget.enabled
+                        ? (currency) {
+                            if (currency == null) return;
+                            setState(() {
+                              selectedCurrency = currency;
+                            });
+
+                            formatter = CurrencyTextInputFormatter(
+                              symbol: '',
+                              decimalDigits: 2,
+                            );
+                            textController.text =
+                                formatter.format(textController.text);
+                            widget.onCurrencySelected(currency);
+                          }
+                        : null,
+                    value: selectedCurrency,
                   ),
-                ),
-                controller: textController,
-                inputFormatters: [formatter],
-                keyboardType: TextInputType.number,
-                onChanged: (value) {
-                  final amount = formatter.getUnformattedValue();
-                  widget.onValueChanged(amount.toDouble());
-                },
+                );
+              },
+            ),
+            TextFormField(
+              enabled: widget.enabled,
+              onTap: () {
+                if (selectedCurrency == null) {
+                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Please select the currency first.',
+                      ),
+                    ),
+                  );
+                }
+              },
+              canRequestFocus: selectedCurrency != null,
+              decoration: InputDecoration(
+                prefix: selectedCurrency != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Text(selectedCurrency!.symbol),
+                      )
+                    : null,
               ),
+              controller: textController,
+              inputFormatters: [formatter],
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                final amount = formatter.getUnformattedValue();
+                widget.onValueChanged(amount.toDouble());
+              },
             ),
           ],
         ),
