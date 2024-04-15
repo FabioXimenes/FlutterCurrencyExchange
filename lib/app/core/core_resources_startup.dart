@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class CoreResourcesStartup extends ResourcesStartup {
   @override
-  void init(GetIt sl) async {
+  Future<void> init(GetIt sl) async {
     sl.registerSingleton(
       Dio(
         BaseOptions(

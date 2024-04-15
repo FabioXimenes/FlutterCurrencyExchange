@@ -10,7 +10,7 @@ void main() async {
   await dotenv.load(fileName: 'assets/env/.env');
 
   for (final resource in Resources.resources) {
-    resource.init(GetIt.instance);
+    await resource.init(GetIt.instance);
   }
 
   runApp(const CurrencyExchangeApp());

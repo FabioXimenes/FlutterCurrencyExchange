@@ -6,7 +6,7 @@ import 'package:get_it/get_it.dart';
 
 class CurrencyExchangeResourcesStartup extends ResourcesStartup {
   @override
-  void init(GetIt sl) {
+  Future<void> init(GetIt sl) async {
     sl.registerSingleton<CurrencyExchangeRemoteDataSource>(
         CurrencyExchangeRemoteDataSourceImpl(apiClient: sl.get()));
 
