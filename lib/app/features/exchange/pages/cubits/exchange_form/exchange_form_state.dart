@@ -1,6 +1,6 @@
 part of 'exchange_form_cubit.dart';
 
-final class ExchangeFormState {
+final class ExchangeFormState extends Equatable {
   final Currency? baseCurrency;
   final Currency? targetCurrency;
   final double? rate;
@@ -38,4 +38,15 @@ final class ExchangeFormState {
       failure: failure.valueOrElse(this.failure),
     );
   }
+
+  @override
+  List<Object?> get props => [
+        baseCurrency,
+        targetCurrency,
+        rate,
+        baseAmount,
+        targetAmount,
+        isLoading,
+        failure,
+      ];
 }
